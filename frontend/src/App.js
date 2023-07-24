@@ -13,15 +13,18 @@ import {
   ProfilePage,
   ShopCreatePage,
   SellerActivationPage,
-} from "./Routes.js";
+  ShopLoginPage,
+} from "./routes/Routes.js";
 import EventsPage from "../src/pages/EventsPage.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import Store from "./redux/store";
-import { loadUser } from "./redux/actions/user";
+import { loadSeller, loadUser } from "./redux/actions/user";
 import { useSelector } from "react-redux";
-import ProtectedRoute from "./ProtectedRoute";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import SellerProtectedRoute from "./routes/SellerProtectedRoute";
+import { ShopHomePage, ShopDashboardPage } from "./routes/ShopRoutes.js";
 
 // import { server } from "./server";
 // import error from "../../backend/middleware/error";
@@ -40,59 +43,74 @@ const App = () => {
   // }, []);
   useEffect(() => {
     Store.dispatch(loadUser());
-    // Store.dispatch(loadSeller());
+    Store.dispatch(loadSeller());
     // Store.dispatch(getAllProducts());
     // Store.dispatch(getAllEvents());
     // getStripeApikey();
   }, []);
 
   return (
-    <>
-      {loading ? null : (
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/sign-up" element={<SignupPage />} />
-            <Route
-              path="/activation/:activation_token"
-              element={<ActivationPage />}
-            />
-            <Route
-              path="/seller/activation/:activation_token"
-              element={<SellerActivationPage />}
-            />
-            <Route path="/products" element={<ProductPage />} />
-            <Route path="/best-selling" element={<BestSelling />} />
-            <Route path="/events" element={<EventsPage />} />
-            <Route path="/faq" element={<FAQPage />} />
-            <Route path="/product/:name" element={<ProductDetailsPage />} />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/sign-up" element={<SignupPage />} />
+        <Route
+          path="/activation/:activation_token"
+          element={<ActivationPage />}
+        />
+        <Route
+          path="/seller/activation/:activation_token"
+          element={<SellerActivationPage />}
+        />
+        <Route path="/products" element={<ProductPage />} />
+        <Route path="/best-selling" element={<BestSelling />} />
+        <Route path="/events" element={<EventsPage />} />
+        <Route path="/faq" element={<FAQPage />} />
+        <Route path="/product/:name" element={<ProductDetailsPage />} />
 
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute isAuthenticated={isAuthenticated}>
-                  <ProfilePage />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/shop-create" element={<ShopCreatePage />} />
-          </Routes>
-          <ToastContainer
-            position="bottom-center"
-            autoClose={5000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="dark"
-          />
-        </BrowserRouter>
-      )}
-    </>
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/shop-create" element={<ShopCreatePage />} />
+        <Route path="/shop-login" element={<ShopLoginPage />} />
+
+        <Route
+          path="/shop/:id"
+          element={
+            <SellerProtectedRoute>
+              <ShopHomePage />
+            </SellerProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard"
+          element={
+            <SellerProtectedRoute>
+              <ShopDashboardPage />
+            </SellerProtectedRoute>
+          }
+        />
+      </Routes>
+      <ToastContainer
+        position="bottom-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
+    </BrowserRouter>
   );
 };
 
