@@ -1,5 +1,6 @@
 const express = require("express");
 // const { isSeller, isAuthenticated, isAdmin } = require("../middleware/auth");
+const { isSeller } = require("../middleware/auth");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const router = express.Router();
 const Product = require("../model/product");
@@ -78,35 +79,39 @@ router.get(
   })
 );
 
-// // delete product of a shop
-// router.delete(
-//   "/delete-shop-product/:id",
-//   isSeller,
-//   catchAsyncErrors(async (req, res, next) => {
-//     try {
-//       const product = await Product.findById(req.params.id);
+// delete product of a shop
+router.delete(
+  "/delete-shop-product/:id",
+  isSeller,
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const productId = req.params.id;
 
-//       if (!product) {
-//         return next(new ErrorHandler("Product is not found with this id", 404));
-//       }
+      // const product = await Product.findById(productId);
+      const product = await Product.findByIdAndDelete(productId);
 
-//       for (let i = 0; 1 < product.images.length; i++) {
-//         const result = await cloudinary.v2.uploader.destroy(
-//           product.images[i].public_id
-//         );
-//       }
+      if (!product) {
+        return next(new ErrorHandler("Product is not found with this id", 404));
+      }
 
-//       await product.remove();
+      // for (let i = 0; 1 < product.images.length; i++) {
+      //   const result = await cloudinary.v2.uploader.destroy(
+      //     product.images[i].public_id
+      //   );
+      // }
 
-//       res.status(201).json({
-//         success: true,
-//         message: "Product Deleted successfully!",
-//       });
-//     } catch (error) {
-//       return next(new ErrorHandler(error, 400));
-//     }
-//   })
-// );
+      // await product.remove();
+
+      res.status(201).json({
+        success: true,
+
+        message: "Product Deleted successfully!",
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error, 400));
+    }
+  })
+);
 
 // // get all products
 // router.get(
