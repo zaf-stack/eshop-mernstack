@@ -89,6 +89,37 @@ router.get(
   })
 );
 
+// // delete event of a shop
+// router.delete(
+//   "/delete-shop-event/:id",
+//   isSeller,
+//   catchAsyncErrors(async (req, res, next) => {
+//     try {
+//       // const productId = req.params.id;
+//       const event = await Event.findByIdAndDelete(req.params.id);
+
+//       if (!event) {
+//         return next(new ErrorHandler("Product is not found with this id", 404));
+//       }
+
+//       // for (let i = 0; 1 < product.images.length; i++) {
+//       //   const result = await cloudinary.v2.uploader.destroy(
+//       //     event.images[i].public_id
+//       //   );
+//       // }
+
+//       // await event.remove();
+
+//       res.status(201).json({
+//         success: true,
+//         message: "Event Deleted successfully!",
+//       });
+//     } catch (error) {
+//       return next(new ErrorHandler(error, 400));
+//     }
+//   })
+// );
+
 // delete event of a shop
 router.delete(
   "/delete-shop-event/:id",
@@ -96,7 +127,26 @@ router.delete(
   catchAsyncErrors(async (req, res, next) => {
     try {
       // const productId = req.params.id;
-      const event = await Event.findByIdAndDelete(req.params.id);
+      // const event = await Event.findByIdAndDelete(req.params.id);
+      const productId = req.params.id;
+      const eventData = await Event.findById(productId);
+
+      eventData.images.forEach((imageUrl) => {
+        const filename = imageUrl;
+        const filePath = `uploads/${filename}`;
+
+        fs.unlink(filePath, (err) => {
+          if (err) {
+            console.log(err);
+            // res.status(500).json({ message: "Error deleting file" });
+          }
+          //  else {
+          //   res.json({ message: `File deleted successfully` });
+          // }
+        });
+      });
+
+      const event = await Event.findByIdAndDelete(productId);
 
       if (!event) {
         return next(new ErrorHandler("Product is not found with this id", 404));
